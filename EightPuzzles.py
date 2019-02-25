@@ -25,3 +25,10 @@ class EightPuzzlesGrid():
     def iterate(self):
         # To be implemented in each algorithm.
         pass
+
+    def is_solved(self):
+        '''
+        Checks if the grid has been solved. This is the same across
+        all algorithms. True if solved, false otherwise
+        '''
+        return true

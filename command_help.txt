@@ -1,0 +1,7 @@
+(1) Convert from .ui to .py
+C:\Users\nickl\Documents\Artificial_Intelligence\Project1\venv\Scripts\python.exe -m PyQt5.uic.pyuic -x designer_main_window.ui -o main_window.py
+
+(2)
+
+
+(3)

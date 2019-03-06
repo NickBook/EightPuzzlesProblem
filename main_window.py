@@ -1,9 +1,14 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
-from EightPuzzles import EightPuzzlesGrid
+from PyQt5.QtCore import QTimer
+from A_Star import A_Star
 
 class Ui_MainWindow(object):
     def __init__(self):
-        self.algorithm =  EightPuzzlesGrid('Alg 1') # Replace Grid with the child class for algorithm
+        self.traceback = None
+        self.current_grid_index = 0
+        self.algorithm_summary = ''
+
+
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(500, 650)
@@ -33,9 +38,6 @@ class Ui_MainWindow(object):
         sizePolicy.setHeightForWidth(self.box_10.sizePolicy().hasHeightForWidth())
         self.box_10.setSizePolicy(sizePolicy)
         self.box_10.setObjectName("box_10")
-        ############# Button Event #################
-        self.box_10.setText(self.algorithm.grid_arr[1][0])
-        ############################################
         self.gridLayout.addWidget(self.box_10, 1, 0, 1, 1)
         self.box_20 = QtWidgets.QPushButton(self.centralwidget)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
@@ -102,6 +104,9 @@ class Ui_MainWindow(object):
         self.horizontalLayout_2.addWidget(self.lbl_time_complexity)
         self.btn_run_algorithm = QtWidgets.QPushButton(self.centralwidget)
         self.btn_run_algorithm.setObjectName("btn_run_algorithm")
+        ###################### Button Event Binding #########################
+        self.btn_run_algorithm.clicked.connect(self.step_algorithm)
+        #####################################################################
         self.horizontalLayout_2.addWidget(self.btn_run_algorithm)
         self.verticalLayout.addLayout(self.horizontalLayout_2)
         self.textBrowser = QtWidgets.QTextBrowser(self.centralwidget)
@@ -132,15 +137,15 @@ class Ui_MainWindow(object):
         self.menubar.addAction(self.menuAlgorithm_Selector.menuAction())
 
         self.alg1_selected()
-        self.init_puzzle()
 
         self.retranslateUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
+
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
-        self.btn_run_algorithm.setText(_translate("MainWindow", "Run Algorithm"))
+        self.btn_run_algorithm.setText(_translate("MainWindow", "Step Algorithm"))
         self.textBrowser.setHtml(_translate("MainWindow", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
 "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
 "p, li { white-space: pre-wrap; }\n"
@@ -148,37 +153,74 @@ class Ui_MainWindow(object):
 "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">Results:</p>\n"
 "<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><br /></p></body></html>"))
         self.menuAlgorithm_Selector.setTitle(_translate("MainWindow", "Algorithm Selector"))
-        self.actionAlg_1.setText(_translate("MainWindow", "Alg 1"))
+        self.actionAlg_1.setText(_translate("MainWindow", "A* Algorithm"))
         self.actionAlg_2.setText(_translate("MainWindow", "Alg 2"))
         self.actionAlg_3.setText(_translate("MainWindow", "Alg 3"))
 
-    def init_puzzle(self):
-        self.box_02.setText(self.algorithm.grid_arr[0][2])
-        self.box_12.setText(self.algorithm.grid_arr[1][2])
-        self.box_22.setText(self.algorithm.grid_arr[2][2])
-        self.box_01.setText(self.algorithm.grid_arr[0][1])
-        self.box_21.setText(self.algorithm.grid_arr[2][1])
-        self.box_20.setText(self.algorithm.grid_arr[2][0])
-        self.box_11.setText(self.algorithm.grid_arr[1][1])
-        self.box_10.setText(self.algorithm.grid_arr[1][0])
-        self.box_00.setText(self.algorithm.grid_arr[0][0])
+
+    def step_algorithm(self):
+        '''
+        Steps through the moves (1 at a time) in the algorithm 
+        to reach the solution.
+        '''
+        if(self.current_grid_index == len(self.traceback)-1):
+            self.btn_run_algorithm.setDisabled(True)
+            self.current_grid_index = 0
+        else:
+            self.current_grid_index += 1
+            self.init_puzzle(self.traceback[self.current_grid_index])
+            self.textBrowser.setText(self.textBrowser.toPlainText() + '\nMoves: {}'.format(self.current_grid_index))
+            scrolling = self.textBrowser.verticalScrollBar()
+            scrolling.setValue(scrolling.maximum())
+            if(self.current_grid_index == len(self.traceback)-1):
+                self.btn_run_algorithm.setDisabled(True)
+                self.textBrowser.setText(self.textBrowser.toPlainText() + self.algorithm_summary)
+                scrolling = self.textBrowser.verticalScrollBar()
+                scrolling.setValue(scrolling.maximum())
+                self.current_grid_index = 0
+            
+
+    def init_puzzle(self,grid):
+        '''
+        Sets the puzzle to a different grid.
+        '''
+        self.box_02.setText(grid[0][2])
+        self.box_12.setText(grid[1][2])
+        self.box_22.setText(grid[2][2])
+        self.box_01.setText(grid[0][1])
+        self.box_21.setText(grid[2][1])
+        self.box_20.setText(grid[2][0])
+        self.box_11.setText(grid[1][1])
+        self.box_10.setText(grid[1][0])
+        self.box_00.setText(grid[0][0])
 
 
     def alg1_selected(self):
-        self.lbl_algorithm_type.setText('Algorithm: Alg 1')
-        self.algorithm = EightPuzzlesGrid('Alg 1') # Once implemented, assign new algorithm 
-        self.init_puzzle()
+        '''
+        Bound to the action item for A* algorith.
+        '''
+        self.lbl_algorithm_type.setText('Algorithm: A* Search')
+        a_star = A_Star()
+        self.traceback = a_star.solve_puzzle()
+        self.current_grid_index = 0
+        self.algorithm_summary =  '\n\n' + a_star.summary
+        self.textBrowser.setText('Results:\n')
+        self.init_puzzle(self.traceback[0])
+        self.btn_run_algorithm.setEnabled(True)
+        
 
     def alg2_selected(self):
         self.lbl_algorithm_type.setText('Algorithm: Alg 2')
         self.algorithm = EightPuzzlesGrid('Alg 2') # Once implemented, assign new algorithm 
         self.init_puzzle()    
+        self.btn_run_algorithm.setEnabled()
+
 
     def alg3_selected(self):
         self.lbl_algorithm_type.setText('Algorithm: Alg 3')
         self.algorithm = EightPuzzlesGrid('Alg 3') # Once implemented, assign new algorithm 
         self.init_puzzle()
-
+        self.btn_run_algorithm.setEnabled()
 
 
 

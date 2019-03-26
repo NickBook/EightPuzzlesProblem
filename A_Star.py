@@ -31,14 +31,16 @@ class A_Star():
         self.open = []
         self.close = []
         self.summary = ''
+        self.root_puzzle_node = PuzzleNode_A_Star(None,[])
+        self.assign_random_puzzle(self.root_puzzle_node)
+        
+    
 
     
     def solve_puzzle(self):
-        root_puzzle_node = PuzzleNode_A_Star(None,[])
-        self.assign_random_puzzle(root_puzzle_node)
-        root_puzzle_node.depth = 0
-        root_puzzle_node.h_cost = self.h_cost(root_puzzle_node)
-        self.open.append(root_puzzle_node)
+        self.root_puzzle_node.depth = 0
+        self.root_puzzle_node.h_cost = self.h_cost(self.root_puzzle_node)
+        self.open.append(self.root_puzzle_node)
 
         while(not self.is_solved(self.open[0])):
             node_to_expand = self.open[0]
@@ -70,14 +72,7 @@ class A_Star():
                         existing_f_cost = existing_puzzle.depth + existing_puzzle.h_cost
                         if(existing_f_cost > f_cost):
                             self.open[open_index] = move
-                    '''elif(closed_index > -1):
-                        existing_puzzle = self.close[closed_index]
-                        existing_f_cost = existing_puzzle.depth + existing_puzzle.h_cost
-                        if(existing_f_cost > f_cost):
-                            self.open.append(move)
-                            self.close.remove(existing_puzzle)'''
-                    
-            
+                            
             self.open = sorted(self.open, key=lambda node: node.depth + node.h_cost)
 
         print('Solved')
@@ -147,6 +142,7 @@ class A_Star():
         aren't solveable, it starts with the solution and then randomly moves
         around tiles a random number of times.
         '''
+        puzzle_node = PuzzleNode_A_Star(None,[])
         puzzle_node.grid = [['1','2','3'], ['8','','4'], ['7','6','5']]
         for i in range(randint(15,100)):
             up_node = self.up_operation(puzzle_node.clone_puzzle())

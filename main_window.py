@@ -128,12 +128,16 @@ class Ui_MainWindow(object):
         self.actionAlg_2.setObjectName("actionAlg_2")
         self.actionAlg_3 = QtWidgets.QAction(MainWindow)
         self.actionAlg_3.setObjectName("actionAlg_3")
+        self.action_compare = QtWidgets.QAction(MainWindow)
+        self.action_compare.setObjectName("Compare Algorithms")
         self.actionAlg_1.triggered.connect(self.alg1_selected)
         self.actionAlg_2.triggered.connect(self.alg2_selected)
         self.actionAlg_3.triggered.connect(self.alg3_selected)
+        self.action_compare.triggered.connect(self.compare_algorithm_selected)
         self.menuAlgorithm_Selector.addAction(self.actionAlg_1)
         self.menuAlgorithm_Selector.addAction(self.actionAlg_2)
         self.menuAlgorithm_Selector.addAction(self.actionAlg_3)
+        self.menuAlgorithm_Selector.addAction(self.action_compare)
         self.menubar.addAction(self.menuAlgorithm_Selector.menuAction())
 
         self.alg1_selected()
@@ -156,6 +160,7 @@ class Ui_MainWindow(object):
         self.actionAlg_1.setText(_translate("MainWindow", "A* Algorithm"))
         self.actionAlg_2.setText(_translate("MainWindow", "Alg 2"))
         self.actionAlg_3.setText(_translate("MainWindow", "Alg 3"))
+        self.action_compare.setText(_translate("MainWindow", "Compare Algorithms"))
 
 
     def step_algorithm(self):
@@ -211,19 +216,27 @@ class Ui_MainWindow(object):
 
     def alg2_selected(self):
         self.lbl_algorithm_type.setText('Algorithm: Alg 2')
-        self.algorithm = EightPuzzlesGrid('Alg 2') # Once implemented, assign new algorithm 
-        self.init_puzzle()    
+        #self.algorithm = EightPuzzlesGrid('Alg 2') # Once implemented, assign new algorithm 
+        #self.init_puzzle()    
         self.btn_run_algorithm.setEnabled()
 
 
     def alg3_selected(self):
         self.lbl_algorithm_type.setText('Algorithm: Alg 3')
-        self.algorithm = EightPuzzlesGrid('Alg 3') # Once implemented, assign new algorithm 
-        self.init_puzzle()
+        #self.algorithm = EightPuzzlesGrid('Alg 3') # Once implemented, assign new algorithm 
+        #self.init_puzzle()
         self.btn_run_algorithm.setEnabled()
 
-
-
+    
+    def compare_algorithm_selected(self):
+        self.btn_run_algorithm.setEnabled(False)
+        self.init_puzzle([['','',''],['','',''],['','','']])
+        a_star = A_Star()
+        for i in range(25):
+            grid = a_star.assign_random_puzzle(None)
+            a_star.root_puzzle_node.grid = grid
+            a_star_solution = a_star.solve_puzzle()
+            self.textBrowser.setText(self.textBrowser)
 
 
 

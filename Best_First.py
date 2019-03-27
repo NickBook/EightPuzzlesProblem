@@ -31,17 +31,23 @@ class Best_First():
         self.open = []
         self.close = []
         self.summary = ''
+        self.root_puzzle_node = PuzzleNode_Best_First(None,[])
+        self.assign_random_puzzle(self.root_puzzle_node)
 
     
     def solve_puzzle(self):
-        root_puzzle_node = PuzzleNode_Best_First(None,[])
-        self.assign_random_puzzle(root_puzzle_node)
-        root_puzzle_node.depth = 0
-        root_puzzle_node.h_cost = self.h_cost(root_puzzle_node)
-        self.open.append(root_puzzle_node)
+        '''
+        Solves the 8-puzzle problem using the best first algorithm
+        '''
+        self.root_puzzle_node.depth = 0
+        self.root_puzzle_node.h_cost = self.h_cost(self.root_puzzle_node)
+        self.open.append(self.root_puzzle_node)
 
         while(not self.is_solved(self.open[0])):
             node_to_expand = self.open[0]
+            if(node_to_expand.depth > 500):
+                print("NO SOLUTION FOR BEST FIRST")
+                return[]
             self.open.remove(node_to_expand)
             self.close.append(node_to_expand)
 
@@ -70,17 +76,10 @@ class Best_First():
                         existing_f_cost = existing_puzzle.h_cost
                         if(existing_f_cost > f_cost):
                             self.open[open_index] = move
-                    '''elif(closed_index > -1):
-                        existing_puzzle = self.close[closed_index]
-                        existing_f_cost = existing_puzzle.depth + existing_puzzle.h_cost
-                        if(existing_f_cost > f_cost):
-                            self.open.append(move)
-                            self.close.remove(existing_puzzle)'''
-                    
             
             self.open = sorted(self.open, key=lambda node: node.h_cost)
 
-        print('Solved')
+        print('Solved with Best First')
         print(self.open[0].grid[0])
         print(self.open[0].grid[1])
         print(self.open[0].grid[2])
@@ -267,5 +266,5 @@ class Best_First():
         return True
 
 # testing the algorithm
-alg = A_Star()
-alg.solve_puzzle()
+#alg = Best_First()
+#arr = alg.solve_puzzle()

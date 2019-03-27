@@ -33,11 +33,13 @@ class A_Star():
         self.summary = ''
         self.root_puzzle_node = PuzzleNode_A_Star(None,[])
         self.assign_random_puzzle(self.root_puzzle_node)
-        
-    
 
     
     def solve_puzzle(self):
+        '''
+        Solve the eight puzzle problem by using the A* searching
+        algorithm with depth and heuristic evaluation function.
+        '''
         self.root_puzzle_node.depth = 0
         self.root_puzzle_node.h_cost = self.h_cost(self.root_puzzle_node)
         self.open.append(self.root_puzzle_node)
@@ -75,7 +77,7 @@ class A_Star():
                             
             self.open = sorted(self.open, key=lambda node: node.depth + node.h_cost)
 
-        print('Solved')
+        print('Solved with A*')
         print(self.open[0].grid[0])
         print(self.open[0].grid[1])
         print(self.open[0].grid[2])
@@ -142,7 +144,7 @@ class A_Star():
         aren't solveable, it starts with the solution and then randomly moves
         around tiles a random number of times.
         '''
-        puzzle_node = PuzzleNode_A_Star(None,[])
+        randint
         puzzle_node.grid = [['1','2','3'], ['8','','4'], ['7','6','5']]
         for i in range(randint(15,100)):
             up_node = self.up_operation(puzzle_node.clone_puzzle())
@@ -263,5 +265,5 @@ class A_Star():
         return True
 
 # testing the algorithm
-alg = A_Star()
-alg.solve_puzzle()
+#alg = A_Star()
+#alg.solve_puzzle()

@@ -1,6 +1,7 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtCore import QTimer
-from A_Star import A_Star
+from A_Star import A_Star, PuzzleNode_A_Star
+from Best_First import Best_First
 
 class Ui_MainWindow(object):
     def __init__(self):
@@ -157,9 +158,9 @@ class Ui_MainWindow(object):
 "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">Results:</p>\n"
 "<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><br /></p></body></html>"))
         self.menuAlgorithm_Selector.setTitle(_translate("MainWindow", "Algorithm Selector"))
-        self.actionAlg_1.setText(_translate("MainWindow", "A* Algorithm"))
-        self.actionAlg_2.setText(_translate("MainWindow", "Alg 2"))
-        self.actionAlg_3.setText(_translate("MainWindow", "Alg 3"))
+        self.actionAlg_1.setText(_translate("MainWindow", "A* Algorithm (heuristical)"))
+        self.actionAlg_2.setText(_translate("MainWindow", "Best First Algorithm (heuristical)"))
+        self.actionAlg_3.setText(_translate("MainWindow", "Breadth First Algorithm (uninformed)"))
         self.action_compare.setText(_translate("MainWindow", "Compare Algorithms"))
 
 
@@ -215,10 +216,14 @@ class Ui_MainWindow(object):
         
 
     def alg2_selected(self):
-        self.lbl_algorithm_type.setText('Algorithm: Alg 2')
-        #self.algorithm = EightPuzzlesGrid('Alg 2') # Once implemented, assign new algorithm 
-        #self.init_puzzle()    
-        self.btn_run_algorithm.setEnabled()
+        self.lbl_algorithm_type.setText('Algorithm: Best First Search')
+        best_first = Best_First()
+        self.traceback = best_first.solve_puzzle()
+        self.current_grid_index = 0
+        self.algorithm_summary =  '\n\n' + best_first.summary
+        self.textBrowser.setText('Results:\n')
+        self.init_puzzle(self.traceback[0])
+        self.btn_run_algorithm.setEnabled(True)
 
 
     def alg3_selected(self):
@@ -229,15 +234,28 @@ class Ui_MainWindow(object):
 
     
     def compare_algorithm_selected(self):
+        self.textBrowser.setText('Calculating averages for all algorithms... please wait!')
         self.btn_run_algorithm.setEnabled(False)
         self.init_puzzle([['','',''],['','',''],['','','']])
         a_star = A_Star()
-        for i in range(25):
-            grid = a_star.assign_random_puzzle(None)
+        best_first = Best_First()
+        a_star_moves_sum, a_star_touched_sum, best_first_moves_sum, best_first_touched_sum = 0, 0, 0, 0
+        for i in range(10):
+            a_star = A_Star()
+            best_first = Best_First()
+            node = PuzzleNode_A_Star(None,[])
+            a_star.assign_random_puzzle(node)
+            grid = a_star.root_puzzle_node.grid
             a_star.root_puzzle_node.grid = grid
             a_star_solution = a_star.solve_puzzle()
-            self.textBrowser.setText(self.textBrowser)
+            a_star_moves_sum += len(a_star_solution)
+            a_star_touched_sum += len(a_star.close)
+            best_first.root_puzzle_node.grid = grid
+            best_first_solution = best_first.solve_puzzle()
+            best_first_moves_sum += len(best_first_solution)
+            best_first_touched_sum += len(best_first.close)
 
+        self.textBrowser.setText('A* had an average of {} moves and {} visited states.\nBest first had an average of {} moves and {} visited states.'.format(a_star_moves_sum/10, a_star_touched_sum/10, best_first_moves_sum/10, best_first_touched_sum/10))
 
 
 ############################# Run the Application #############################

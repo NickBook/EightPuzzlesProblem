@@ -264,6 +264,6 @@ class A_Star():
                     return False
         return True
 
-# testing the algorithm
+# testing the algorithm (uncomment to individually test the algorithm)
 #alg = A_Star()
 #alg.solve_puzzle()

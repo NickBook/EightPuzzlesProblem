@@ -265,6 +265,6 @@ class Best_First():
                     return False
         return True
 
-# testing the algorithm
+# testing the algorithm (uncomment to individually test the algorithm)
 #alg = Best_First()
 #arr = alg.solve_puzzle()

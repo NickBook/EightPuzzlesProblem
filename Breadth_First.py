@@ -240,5 +240,6 @@ class Breadth_First():
                     return False
         return True
 
-alg = Breadth_First()
-alg.solve_puzzle()
+# test bed for Breadth-First (uncomment to individually test the algorithm)
+#alg = Breadth_First()
+#alg.solve_puzzle()

@@ -2,6 +2,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtCore import QTimer
 from A_Star import A_Star, PuzzleNode_A_Star
 from Best_First import Best_First
+from Breadth_First import Breadth_First
 
 class Ui_MainWindow(object):
     def __init__(self):
@@ -161,7 +162,7 @@ class Ui_MainWindow(object):
         self.actionAlg_1.setText(_translate("MainWindow", "A* Algorithm (heuristical)"))
         self.actionAlg_2.setText(_translate("MainWindow", "Best First Algorithm (heuristical)"))
         self.actionAlg_3.setText(_translate("MainWindow", "Breadth First Algorithm (uninformed)"))
-        self.action_compare.setText(_translate("MainWindow", "Compare Algorithms"))
+        self.action_compare.setText(_translate("MainWindow", "Compare Best First and A* Algorithms"))
 
 
     def step_algorithm(self):
@@ -227,14 +228,17 @@ class Ui_MainWindow(object):
 
 
     def alg3_selected(self):
-        self.lbl_algorithm_type.setText('Algorithm: Alg 3')
-        #self.algorithm = EightPuzzlesGrid('Alg 3') # Once implemented, assign new algorithm 
-        #self.init_puzzle()
-        self.btn_run_algorithm.setEnabled()
+        self.lbl_algorithm_type.setText('Algorithm: Breadth First')
+        breadth_first = Breadth_First()
+        self.traceback = breadth_first.solve_puzzle()
+        self.current_grid_index = 0
+        self.algorithm_summary =  '\n\n' + breadth_first.summary
+        self.textBrowser.setText('Results:\n')
+        self.init_puzzle(self.traceback[0])
+        self.btn_run_algorithm.setEnabled(True)
 
     
     def compare_algorithm_selected(self):
-        self.textBrowser.setText('Calculating averages for all algorithms... please wait!')
         self.btn_run_algorithm.setEnabled(False)
         self.init_puzzle([['','',''],['','',''],['','','']])
         a_star = A_Star()
@@ -255,7 +259,7 @@ class Ui_MainWindow(object):
             best_first_moves_sum += len(best_first_solution)
             best_first_touched_sum += len(best_first.close)
 
-        self.textBrowser.setText('A* had an average of {} moves and {} visited states.\nBest first had an average of {} moves and {} visited states.'.format(a_star_moves_sum/10, a_star_touched_sum/10, best_first_moves_sum/10, best_first_touched_sum/10))
+        self.textBrowser.setText('A* had an average of {} moves and {} visited states.\nBest first had an average of {} moves and {} visited states.\n\nWe decided not to compare breadth first since it takes a long time for paths greater than 8.'.format(a_star_moves_sum/10, a_star_touched_sum/10, best_first_moves_sum/10, best_first_touched_sum/10))
 
 
 ############################# Run the Application #############################
